@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:catalogue
+    username: sa
+    password: sa
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${wiremock.server.baseUrl}/.well-known/jwks.json
+wiremock:
+  server:
+    baseUrl: http://localhost:${wiremock.server.port}

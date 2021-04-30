@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: catalogue
+  profiles:
+    active: local
+  cloud:
+    config:
+      uri: http://library.lan/config-server

@@ -1,0 +1,3 @@
+rootProject.name = 'catalogue'
+// One lockfile per project
+enableFeaturePreview('ONE_LOCKFILE_PER_PROJECT')
