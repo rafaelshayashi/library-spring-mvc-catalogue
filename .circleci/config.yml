@@ -34,7 +34,7 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      - run: gradle clean build -x
+      - run: gradle clean build -x test
 
       - persist_to_workspace:
           root: build
