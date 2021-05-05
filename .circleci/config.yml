@@ -33,6 +33,15 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
+
+      - run: gradle clean build -x
+
+      - persist_to_workspace:
+          root: build
+          paths:
+            - bootJarMainClassName
+            - libs
+            - tmp
   test:
     executor: base-image
     environment:
@@ -40,6 +49,8 @@ jobs:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
     steps:
+      - attach_workspace:
+          at: build
       # run tests!
       - run: gradle test
 
