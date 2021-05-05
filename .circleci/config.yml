@@ -32,9 +32,21 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-
+  test:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:11-jdk
+    working_directory: ~/repo
+    steps:
       # run tests!
       - run: gradle test
 
       - store_test_results:
           path: ./build/test-results/test
+
+workflows:
+  version: 2
+  pipeline:
+    jobs:
+      - build
+      - test
