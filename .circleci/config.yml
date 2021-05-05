@@ -3,14 +3,16 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2.1
-jobs:
-  build:
+executors:
+  base-image:
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:11-jdk
+      working_directory: ~/repo
 
-    working_directory: ~/repo
-
+jobs:
+  build:
+    executor: base-image
     environment:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
@@ -33,10 +35,11 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
   test:
-    docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:11-jdk
-    working_directory: ~/repo
+    executor: base-image
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
     steps:
       # run tests!
       - run: gradle test
@@ -49,4 +52,6 @@ workflows:
   pipeline:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build
