@@ -37,11 +37,11 @@ jobs:
       - run: gradle clean build -x test
 
       - persist_to_workspace:
-          root: build
+          root: ~/repo
           paths:
-            - bootJarMainClassName
-            - libs
-            - tmp
+            - build.gradle
+            - build/*
+
   test:
     executor: base-image
     environment:
@@ -50,7 +50,7 @@ jobs:
       TERM: dumb
     steps:
       - attach_workspace:
-          at: build
+          at: ~/repo
       # run tests!
       - run: gradle test
 
