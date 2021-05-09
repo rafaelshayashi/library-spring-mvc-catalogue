@@ -13,47 +13,37 @@ jobs:
   build:
     executor: base-image
     environment:
-      # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
-
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-
       - run: gradle dependencies
-
       - save_cache:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-
       - run: gradle clean build -x test
-
       - persist_to_workspace:
-          root: ~/repo
+          root: .
           paths:
             - build.gradle
-            - build/*
+            - build
+            - cloud
 
   test:
     executor: base-image
     environment:
-      # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
     steps:
       - attach_workspace:
           at: ~/repo
-      # run tests!
       - run: gradle test
-
       - store_test_results:
           path: ./build/test-results/test
 
