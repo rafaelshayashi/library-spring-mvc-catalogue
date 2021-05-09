@@ -7,51 +7,65 @@ executors:
   base-image:
     docker:
       - image: circleci/openjdk:11-jdk
-    working_directory: ~/repo
+    working_directory: ~/workspace
 
 jobs:
+  checkout-code:
+    executor: base-image
+    steps:
+      - checkout:
+          path: ~/workspace/repo
+      - persist_to_workspace:
+          root: ~/workspace
+          paths:
+            - repo/
   build:
     executor: base-image
+    working_directory: ~/workspace/repo
     environment:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
     steps:
-      - checkout
+      - attach_workspace:
+          at: ~/workspace
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
       - run: gradle dependencies
+      - run: gradle clean build -x test
       - save_cache:
           paths:
             - ~/.gradle
+            - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run: gradle clean build -x test
-      - persist_to_workspace:
-          root: .
-          paths:
-            - build.gradle
-            - build
-            - cloud
-
+      - store_test_results:
+          path: ./build/test-results/test
   test:
     executor: base-image
-    environment:
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
+    working_directory: ~/workspace/repo
     steps:
       - attach_workspace:
-          at: ~/repo
+          at: ~/workspace
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
       - run: gradle test
       - store_test_results:
           path: ./build/test-results/test
+
 
 workflows:
   version: 2
   pipeline:
     jobs:
-      - build
+      - checkout-code
+      - build:
+          requires:
+            - checkout-code
       - test:
           requires:
             - build
